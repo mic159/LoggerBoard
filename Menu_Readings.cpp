@@ -7,7 +7,7 @@ extern ClosedCube_HDC1080 humidity;
 
 ReadingsMenu::ReadingsMenu() {}
 
-void ReadingsMenu::draw(Adafruit_GFX* display) const {
+void ReadingsMenu::draw(SSD_13XX* display) const {
   drawLayout(display, "Live");
 
   display->setCursor(0, 15);

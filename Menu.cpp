@@ -2,9 +2,22 @@
 #include <Adafruit_GFX.h>
 #include <RTClib.h>
 #include "Menu.h"
+#include "State.h"
 
+
+const PROGMEM uint8_t SD_ICON[] = {
+  0b00000000,
+  0b00001110,
+  0b00011110,
+  0b00111110,
+  0b00111110,
+  0b00111110,
+  0b00111110,
+  0b00000000,
+};
 
 extern DateTime now;
+extern state_t state;
 Menu* menu[MENU_MAX] = {0};
 const char* menu_title[MENU_MAX] = {0};
 bool menu_show[MENU_MAX] = {0};
@@ -17,6 +30,7 @@ const uint16_t COLOR_BG_1 = Color565(0xf5, 0xf5, 0xf6);
 const uint16_t COLOR_CHROME = Color565(0x5d, 0x99, 0xc6);
 const uint16_t COLOR_HEADER = Color565(0x90, 0xca, 0xf9);
 const uint16_t COLOR_LIGHT = Color565(0xc3, 0xfd, 0xff);
+const uint16_t COLOR_RED = Color565(0xff, 0x00, 0x00);
 
 void switchMenu(Menu_selection s) {
   menu_current = s;
@@ -34,14 +48,13 @@ Menu* currentMenu() {
 
 Menu::Menu() {}
 
-void Menu::drawLayout(Adafruit_GFX* display, const char* title) const {
+void Menu::drawLayout(SSD_13XX* display, const char* title) const {
   display->fillScreen(COLOR_BG_1);
   display->fillRect(0, 0, display->width(), 8, COLOR_CHROME);
 
-  
   // Title
   display->setTextColor(COLOR_TEXT);
-  display->setTextSize(1);
+  display->setTextScale(1);
   display->setCursor(2, 1);
   display->print(title);
 
@@ -50,11 +63,15 @@ void Menu::drawLayout(Adafruit_GFX* display, const char* title) const {
   display->setCursor(display->width() - 31, 1);
   snprintf_P(buff, 7, PSTR("%02d:%02d"), now.hour(), now.minute());
   display->print(buff);
+
+//  if (state.sd_inserted) {
+  display->drawBitmap(display->width() - 8, 0, SD_ICON, 8, 8, state.sd_inserted ? 0 : COLOR_RED);
+//  }
 }
 
 SettingsMenu::SettingsMenu() {}
 
-void SettingsMenu::draw(Adafruit_GFX* display) const {
+void SettingsMenu::draw(SSD_13XX* display) const {
   drawLayout(display, "Main");
   int offset = 0;
   for (int i = 0; i < MENU_MAX; ++i) {
