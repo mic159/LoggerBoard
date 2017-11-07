@@ -29,6 +29,7 @@ Buttons buttons;
 Bounce sdDetect;
 
 unsigned long rtc_last = 0;
+unsigned long sd_last = 0;
 state_t state = {0};
 DateTime now;
 
@@ -58,16 +59,9 @@ void setup() {
   now = rtc.now();
   rtc_last = millis();
 
-  sdDetect.update();
-  if (sdDetect.rose() && SD.begin(SD_CS)) {
-    state.sd_inserted = true;
-  } else {
-    state.sd_inserted = false;
-    digitalWrite(LED_RED, HIGH);
-  }
-
   registerMenu(MENU_SETTINGS, new SettingsMenu(), NULL, false);
   registerMenu(MENU_READINGS, new ReadingsMenu(), "Live readings", true);
+  registerMenu(MENU_SET_CLOCK, new SetClockMenu(), "Set Clock", true);
 }
 
 void loop() {
@@ -77,15 +71,19 @@ void loop() {
     rtc_last = millis();
     draw = true;
   }
-  if (sdDetect.update()) {
-    if (sdDetect.rose()) {
-      state.sd_inserted = SD.begin(SD_CS);
-    } else if (sdDetect.fell()) {
-      state.sd_inserted = false;
+
+  // Check for SD insertion
+  if (state.sd_inserted == false && millis() - sd_last > 1000) {
+    state.sd_inserted = SD.begin(SD_CS);
+    if (state.sd_inserted) {
+      draw = true;
+      digitalWrite(LED_RED, HIGH);
+    } else {
+      digitalWrite(LED_RED, LOW);
     }
-    digitalWrite(LED_RED, !state.sd_inserted);
-    draw = true;
+    sd_last = millis();
   }
+
   if (buttons.update()) {
     draw = currentMenu()->update(buttons);
   }

@@ -7,6 +7,7 @@
 enum Menu_selection {
   MENU_SETTINGS,
   MENU_READINGS,
+  MENU_SET_CLOCK,
 
   MENU_MAX,
 };
@@ -35,12 +36,15 @@ public:
   void draw(SSD_13XX* display) const;
 };
 
-//class ClockMenu : public Menu {
-//public:
-//  ClockMenu();
-//  bool update(Buttons& buttons);
-//  void draw(SSD_13XX* display) const;
-//};
+class SetClockMenu : public Menu {
+public:
+  SetClockMenu();
+  bool update(Buttons& buttons);
+  void draw(SSD_13XX* display) const;
+
+private:
+  int selection;
+};
 
 void registerMenu(Menu_selection type, Menu* instance, const char* title, bool show_in_menu);
 void switchMenu(Menu_selection);

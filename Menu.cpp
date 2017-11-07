@@ -3,6 +3,7 @@
 #include <RTClib.h>
 #include "Menu.h"
 #include "State.h"
+#include "Color.h"
 
 
 const PROGMEM uint8_t SD_ICON[] = {
@@ -23,14 +24,6 @@ const char* menu_title[MENU_MAX] = {0};
 bool menu_show[MENU_MAX] = {0};
 Menu_selection menu_current = MENU_SETTINGS;
 
-uint16_t Color565(uint8_t r, uint8_t g, uint8_t b);
-
-const uint16_t COLOR_TEXT = 0;
-const uint16_t COLOR_BG_1 = Color565(0xf5, 0xf5, 0xf6);
-const uint16_t COLOR_CHROME = Color565(0x5d, 0x99, 0xc6);
-const uint16_t COLOR_HEADER = Color565(0x90, 0xca, 0xf9);
-const uint16_t COLOR_LIGHT = Color565(0xc3, 0xfd, 0xff);
-const uint16_t COLOR_RED = Color565(0xff, 0x00, 0x00);
 
 void switchMenu(Menu_selection s) {
   menu_current = s;
@@ -60,7 +53,7 @@ void Menu::drawLayout(SSD_13XX* display, const char* title) const {
 
   // Clock
   char buff[8];
-  display->setCursor(display->width() - 31, 1);
+  display->setCursor(display->width() - 35, 1);
   snprintf_P(buff, 7, PSTR("%02d:%02d"), now.hour(), now.minute());
   display->print(buff);
 
@@ -103,16 +96,5 @@ bool SettingsMenu::update(Buttons& buttons) {
     return true;
   }
   return false;
-}
-
-uint16_t Color565(uint8_t r, uint8_t g, uint8_t b) {
-  uint16_t c;
-  c = r >> 3;
-  c <<= 6;
-  c |= g >> 2;
-  c <<= 5;
-  c |= b >> 3;
-
-  return c;
 }
 
