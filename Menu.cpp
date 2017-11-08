@@ -4,6 +4,7 @@
 #include "Menu.h"
 #include "State.h"
 #include "Color.h"
+#include "Logger.h"
 
 
 const PROGMEM uint8_t SD_ICON[] = {
@@ -16,9 +17,30 @@ const PROGMEM uint8_t SD_ICON[] = {
   0b00111110,
   0b00000000,
 };
+const PROGMEM uint8_t SD_CROSS[] = {
+  0b00000000,
+  0b01000000,
+  0b00100000,
+  0b00010000,
+  0b00001000,
+  0b00000100,
+  0b00000010,
+  0b00000001,
+};
+const PROGMEM uint8_t RECORDING_ICON[] = {
+  0b00111100,
+  0b01111110,
+  0b11111111,
+  0b11111111,
+  0b11111111,
+  0b11111111,
+  0b01111110,
+  0b00111100,
+};
 
 extern DateTime now;
 extern state_t state;
+extern Logger logger;
 Menu* menu[MENU_MAX] = {0};
 const char* menu_title[MENU_MAX] = {0};
 bool menu_show[MENU_MAX] = {0};
@@ -53,13 +75,18 @@ void Menu::drawLayout(SSD_13XX* display, const char* title) const {
 
   // Clock
   char buff[8];
-  display->setCursor(display->width() - 35, 1);
+  display->setCursor(display->width() - 45, 1);
   snprintf_P(buff, 7, PSTR("%02d:%02d"), now.hour(), now.minute());
   display->print(buff);
 
-//  if (state.sd_inserted) {
-  display->drawBitmap(display->width() - 8, 0, SD_ICON, 8, 8, state.sd_inserted ? 0 : COLOR_RED);
-//  }
+  display->drawBitmap(display->width() - 8, 0, SD_ICON, 8, 8, state.sd == SD_BADCARD ? COLOR_RED : 0);
+  if (state.sd == SD_NOCARD) {
+    display->drawBitmap(display->width() - 8, 0, SD_CROSS, 8, 8, COLOR_RED);
+  }
+
+  if (logger.recording) {
+    display->drawBitmap(display->width() - 18, 0, RECORDING_ICON, 8, 8, COLOR_RED);
+  }
 }
 
 SettingsMenu::SettingsMenu() {}

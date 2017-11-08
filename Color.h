@@ -12,7 +12,6 @@ inline uint16_t Color565(uint8_t r, uint8_t g, uint8_t b) {
   return c;
 }
 
-
 const uint16_t COLOR_TEXT = 0;
 const uint16_t COLOR_BG_1 = Color565(0xf5, 0xf5, 0xf6);
 const uint16_t COLOR_CHROME = Color565(0x5d, 0x99, 0xc6);

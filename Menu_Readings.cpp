@@ -12,8 +12,11 @@ void ReadingsMenu::draw(SSD_13XX* display) const {
 
   display->setCursor(0, 15);
 
+  float temperature, pressureReading;
+  pressure.getPT(&pressureReading, &temperature);
+
   display->print("T1: ");
-  display->print(pressure.getTemperature());
+  display->print(temperature);
   display->println(" C");
   
   display->print("T2: ");
@@ -21,7 +24,7 @@ void ReadingsMenu::draw(SSD_13XX* display) const {
   display->println(" C");
   
   display->print("P: ");
-  display->print(pressure.getPressure());
+  display->print(pressureReading);
   display->println(" kPa");
   
   display->print("H: ");

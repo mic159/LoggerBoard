@@ -3,13 +3,13 @@
 #include <Bounce2.h>
 #include <SD.h>
 #include <SSD_13XX.h>
-#include <Adafruit_GFX.h>
 #include <Adafruit_MPL115A2.h>
 #include <ClosedCube_HDC1080.h>
 #include <RTClib.h>
 #include "Menu.h"
 #include "Buttons.h"
 #include "State.h"
+#include "Logger.h"
 
 //OLED
 #define OLED_CS   8
@@ -27,10 +27,11 @@ ClosedCube_HDC1080 humidity;
 RTC_DS1307 rtc;
 Buttons buttons;
 Bounce sdDetect;
+Logger logger;
 
 unsigned long rtc_last = 0;
-unsigned long sd_last = 0;
-state_t state = {0};
+unsigned long sd_countdown = 0;
+state_t state;
 DateTime now;
 
 const uint16_t COLOR_CHROME = display.Color565(0x5d, 0x99, 0xc6);
@@ -49,7 +50,7 @@ void setup() {
   pressure.begin();
   humidity.begin(0x40);
   buttons.begin();
-  sdDetect.attach(SD_DETECT);
+  sdDetect.attach(SD_DETECT, INPUT_PULLUP);
   sdDetect.interval(5);
 
   pinMode(LED_RED, OUTPUT); digitalWrite(LED_RED, HIGH);
@@ -58,10 +59,19 @@ void setup() {
 
   now = rtc.now();
   rtc_last = millis();
+  
+  // Booting with SD card inserted
+  if (sdDetect.read() == false) {
+    state.sd = SD.begin(SD_CS) ? SD_INSERTED : SD_BADCARD;
+  } else {
+    state.sd = SD_NOCARD;
+  }
+  digitalWrite(LED_RED, state.sd == SD_INSERTED ? HIGH : LOW);
 
   registerMenu(MENU_SETTINGS, new SettingsMenu(), NULL, false);
   registerMenu(MENU_READINGS, new ReadingsMenu(), "Live readings", true);
   registerMenu(MENU_SET_CLOCK, new SetClockMenu(), "Set Clock", true);
+  registerMenu(MENU_RECORD, new RecordMenu(), "Record Log", true);
 }
 
 void loop() {
@@ -72,17 +82,30 @@ void loop() {
     draw = true;
   }
 
-  // Check for SD insertion
-  if (state.sd_inserted == false && millis() - sd_last > 1000) {
-    state.sd_inserted = SD.begin(SD_CS);
-    if (state.sd_inserted) {
-      draw = true;
-      digitalWrite(LED_RED, HIGH);
-    } else {
+  if (sdDetect.update()) {
+    if (sdDetect.fell()) {
+      state.sd = SD_BADCARD;
+      sd_countdown = millis() + 100;
+    } else if (sdDetect.rose()) {
+      state.sd = SD_NOCARD;
       digitalWrite(LED_RED, LOW);
     }
-    sd_last = millis();
+    draw = true;
   }
+
+  if (state.sd == SD_BADCARD && sd_countdown < millis()) {
+    if (SD.begin(SD_CS)) {
+      state.sd = SD_INSERTED;
+      digitalWrite(LED_RED, HIGH); // Turn off
+      draw = true;
+    } else {
+      // Try again in 1 second
+      sd_countdown = millis() + 1000;
+      digitalWrite(LED_RED, LOW); // Turn on
+    }
+  }
+
+  logger.update();
 
   if (buttons.update()) {
     draw = currentMenu()->update(buttons);

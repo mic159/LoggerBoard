@@ -8,6 +8,7 @@ enum Menu_selection {
   MENU_SETTINGS,
   MENU_READINGS,
   MENU_SET_CLOCK,
+  MENU_RECORD,
 
   MENU_MAX,
 };
@@ -42,6 +43,15 @@ public:
   bool update(Buttons& buttons);
   void draw(SSD_13XX* display) const;
 
+private:
+  int selection;
+};
+
+class RecordMenu : public Menu {
+public:
+  RecordMenu();
+  bool update(Buttons& buttons);
+  void draw(SSD_13XX* display) const;
 private:
   int selection;
 };
