@@ -8,7 +8,6 @@
 #include <RTClib.h>
 #include "Menu.h"
 #include "Buttons.h"
-#include "State.h"
 #include "Logger.h"
 
 //OLED
@@ -31,7 +30,6 @@ Logger logger;
 
 unsigned long rtc_last = 0;
 unsigned long sd_countdown = 0;
-state_t state;
 DateTime now;
 
 const uint16_t COLOR_CHROME = display.Color565(0x5d, 0x99, 0xc6);
@@ -62,16 +60,17 @@ void setup() {
   
   // Booting with SD card inserted
   if (sdDetect.read() == false) {
-    state.sd = SD.begin(SD_CS) ? SD_INSERTED : SD_BADCARD;
+    logger.sd = SD.begin(SD_CS) ? SD_INSERTED : SD_BADCARD;
   } else {
-    state.sd = SD_NOCARD;
+    logger.sd = SD_NOCARD;
   }
-  digitalWrite(LED_RED, state.sd == SD_INSERTED ? HIGH : LOW);
+  digitalWrite(LED_RED, logger.sd == SD_INSERTED ? HIGH : LOW);
 
   registerMenu(MENU_SETTINGS, new SettingsMenu(), NULL, false);
   registerMenu(MENU_READINGS, new ReadingsMenu(), "Live readings", true);
   registerMenu(MENU_SET_CLOCK, new SetClockMenu(), "Set Clock", true);
   registerMenu(MENU_RECORD, new RecordMenu(), "Record Log", true);
+  registerMenu(MENU_LOG_VIEW_DIR, new LogViewerMenu(), "Browse SD", true);
 }
 
 void loop() {
@@ -84,18 +83,18 @@ void loop() {
 
   if (sdDetect.update()) {
     if (sdDetect.fell()) {
-      state.sd = SD_BADCARD;
+      logger.sd = SD_BADCARD;
       sd_countdown = millis() + 100;
     } else if (sdDetect.rose()) {
-      state.sd = SD_NOCARD;
+      logger.sd = SD_NOCARD;
       digitalWrite(LED_RED, LOW);
     }
     draw = true;
   }
 
-  if (state.sd == SD_BADCARD && sd_countdown < millis()) {
+  if (logger.sd == SD_BADCARD && sd_countdown < millis()) {
     if (SD.begin(SD_CS)) {
-      state.sd = SD_INSERTED;
+      logger.sd = SD_INSERTED;
       digitalWrite(LED_RED, HIGH); // Turn off
       draw = true;
     } else {

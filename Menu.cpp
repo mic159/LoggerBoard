@@ -2,7 +2,6 @@
 #include <Adafruit_GFX.h>
 #include <RTClib.h>
 #include "Menu.h"
-#include "State.h"
 #include "Color.h"
 #include "Logger.h"
 
@@ -39,7 +38,6 @@ const PROGMEM uint8_t RECORDING_ICON[] = {
 };
 
 extern DateTime now;
-extern state_t state;
 extern Logger logger;
 Menu* menu[MENU_MAX] = {0};
 const char* menu_title[MENU_MAX] = {0};
@@ -49,6 +47,7 @@ Menu_selection menu_current = MENU_SETTINGS;
 
 void switchMenu(Menu_selection s) {
   menu_current = s;
+  menu[menu_current]->onEnter();
 }
 
 void registerMenu(Menu_selection type, Menu* instance, const char* title, bool show_in_menu) {
@@ -75,17 +74,17 @@ void Menu::drawLayout(SSD_13XX* display, const char* title) const {
 
   // Clock
   char buff[8];
-  display->setCursor(display->width() - 45, 1);
+  display->setCursor(display->width() - 41, 1);
   snprintf_P(buff, 7, PSTR("%02d:%02d"), now.hour(), now.minute());
   display->print(buff);
 
-  display->drawBitmap(display->width() - 8, 0, SD_ICON, 8, 8, state.sd == SD_BADCARD ? COLOR_RED : 0);
-  if (state.sd == SD_NOCARD) {
+  display->drawBitmap(display->width() - 8, 0, SD_ICON, 8, 8, logger.sd == SD_BADCARD ? COLOR_RED : 0);
+  if (logger.sd == SD_NOCARD) {
     display->drawBitmap(display->width() - 8, 0, SD_CROSS, 8, 8, COLOR_RED);
   }
 
   if (logger.recording) {
-    display->drawBitmap(display->width() - 18, 0, RECORDING_ICON, 8, 8, COLOR_RED);
+    display->drawBitmap(display->width() - 16, 0, RECORDING_ICON, 8, 8, COLOR_RED);
   }
 }
 

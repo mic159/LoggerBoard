@@ -1,19 +1,16 @@
 #include "Menu.h"
-#include "State.h"
 #include "Logger.h"
 
 extern Logger logger;
-extern state_t state;
 
 
 RecordMenu::RecordMenu()
-: selection(0)
 {}
 
 void RecordMenu::draw(SSD_13XX* display) const {
   drawLayout(display, "Record");
 
-  if (state.sd != SD_INSERTED) {
+  if (logger.sd != SD_INSERTED) {
     display->setCursor(0, 15);
     display->print("Insert SD card");
     return;
@@ -36,7 +33,7 @@ bool RecordMenu::update(Buttons& buttons) {
     switchMenu(MENU_SETTINGS);
     return true;
   }
-  if (buttons.enter() && state.sd == SD_INSERTED) {
+  if (buttons.enter() && logger.sd == SD_INSERTED) {
     if (logger.recording) {
       logger.stop();
     } else {

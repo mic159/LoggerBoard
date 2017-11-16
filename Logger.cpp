@@ -1,5 +1,4 @@
 #include "Logger.h"
-#include "State.h"
 #include <RTClib.h>
 #include <SD.h>
 #include <Adafruit_MPL115A2.h>
@@ -8,7 +7,6 @@
 extern Adafruit_MPL115A2 pressure;
 extern ClosedCube_HDC1080 humidity;
 extern DateTime now;
-extern state_t state;
 
 File currentLog;
 
@@ -16,10 +14,11 @@ Logger::Logger()
 : recording(false)
 , linesWritten(0)
 , last(0)
+, sd(SD_NOCARD)
 {}
 
 void Logger::update() {
-  if (recording && state.sd != SD_INSERTED) {
+  if (recording && sd != SD_INSERTED) {
     stop();
   }
 
