@@ -65,6 +65,8 @@ public:
   void onEnter();
 private:
   int selection;
+  String currentPath;
+  bool isDirectory;
 };
 
 void registerMenu(Menu_selection type, Menu* instance, const char* title, bool show_in_menu);
