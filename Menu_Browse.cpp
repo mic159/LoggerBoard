@@ -159,6 +159,7 @@ void BrowseMenu::updateListing() {
   if (!root) return;
   isDirectory = root.isDirectory();
   if (isDirectory) {
+    root.rewindDirectory();
     File entry = root.openNextFile();
     while (entry) {
       currentFileListing.push_back(
@@ -176,6 +177,7 @@ void BrowseMenu::updateListing() {
 
 void BrowseMenu::onEnter() {
   currentPath = "/";
+  selection = 0;
   isDirectory = true;
   updateListing();
 }
