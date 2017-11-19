@@ -70,7 +70,7 @@ void setup() {
   registerMenu(MENU_READINGS, new ReadingsMenu(), "Live readings", true);
   registerMenu(MENU_SET_CLOCK, new SetClockMenu(), "Set Clock", true);
   registerMenu(MENU_RECORD, new RecordMenu(), "Record Log", true);
-  registerMenu(MENU_LOG_VIEW_DIR, new LogViewerMenu(), "Browse SD", true);
+  registerMenu(MENU_BROWSE, new BrowseMenu(), "Browse SD", true);
 }
 
 void loop() {
@@ -106,8 +106,8 @@ void loop() {
 
   logger.update();
 
-  if (buttons.update()) {
-    draw = currentMenu()->update(buttons);
+  if (buttons.update() || draw) {
+    draw |= currentMenu()->update(buttons);
   }
   if (draw) {
     currentMenu()->draw(&display);

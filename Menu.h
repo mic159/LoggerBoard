@@ -9,7 +9,7 @@ enum Menu_selection {
   MENU_READINGS,
   MENU_SET_CLOCK,
   MENU_RECORD,
-  MENU_LOG_VIEW_DIR,
+  MENU_BROWSE,
 
   MENU_MAX,
 };
@@ -56,16 +56,15 @@ public:
   void draw(SSD_13XX* display) const;
 };
 
-class LogViewerMenu : public Menu {
+class BrowseMenu : public Menu {
 public:
-  LogViewerMenu();
+  BrowseMenu();
   bool update(Buttons& buttons);
   void draw(SSD_13XX* display) const;
   void updateListing();
   void onEnter();
 private:
   int selection;
-  int maxFiles;
 };
 
 void registerMenu(Menu_selection type, Menu* instance, const char* title, bool show_in_menu);
