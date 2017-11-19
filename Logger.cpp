@@ -10,6 +10,8 @@ extern DateTime now;
 
 File currentLog;
 
+void dateTime(uint16_t* date, uint16_t* time);
+
 Logger::Logger()
 : recording(false)
 , linesWritten(0)
@@ -43,6 +45,7 @@ void Logger::update() {
 
 void Logger::start() {
   if (recording) return;
+  SdFile::dateTimeCallback(dateTime);
   currentLog = SD.open("LOG.csv", FILE_WRITE);
   if (currentLog) recording = true;
   linesWritten = 0;
@@ -52,5 +55,13 @@ void Logger::stop() {
   if (!recording) return;
   if (currentLog) currentLog.close();
   recording = false;
+}
+
+void dateTime(uint16_t* date, uint16_t* time) {
+  // return date using FAT_DATE macro to format fields
+  *date = FAT_DATE(now.year(), now.month(), now.day());
+
+  // return time using FAT_TIME macro to format fields
+  *time = FAT_TIME(now.hour(), now.minute(), now.second());
 }
 
