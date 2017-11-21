@@ -2,9 +2,9 @@
 
 ## Hardware
 
-Processor: Cortex M0 (SAMD21G18A)
-Screen: 96x64 Color OLED (SSD1331)
-Sensors:
+- Processor: Cortex M0 (SAMD21G18A)
+- Screen: 96x64 Color OLED (SSD1331)
+- Sensors:
  - HDC1080DMBT (Temperature/Humidity)
  - MPL115A2 (Temperature/Pressure)
 
@@ -18,7 +18,7 @@ In the _Boards Manager URLs_ box, add `https://adafruit.github.io/arduino-board-
 
 Now go to **Tools** > **Board** > **Boards Manager**, search for `Adafruit SAMD Boards` and install the latest version.
 
-Go back to **Tools** > **Board** and select the `XXXX`
+Go back to **Tools** > **Board** and select `Adafruit Feather M0`
 
 ### Libraries
 
