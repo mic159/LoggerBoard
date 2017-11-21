@@ -1,4 +1,12 @@
-# Example logger firmware for the logger board
+# Firmware for Mike's SAMD21G Sensor Board with Color Oled.
+
+This firmware allows you to view the sensors, and record them to the SD card.
+
+- View live readings
+- Set the RTC
+- Record readings to a CSV on the SD card
+- Browse and delete items from the SD card
+
 
 ## Hardware
 
